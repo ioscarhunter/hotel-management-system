@@ -7,7 +7,7 @@ class Room {
   Room(this.name, this.floor);
 
   @Index(type: IndexType.value)
-  Id id = Isar.autoIncrement; // you can also use id = null to auto increment
+  Id id = Isar.autoIncrement;
 
   final String name;
 

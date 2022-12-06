@@ -7,7 +7,7 @@ class KeyCard {
   KeyCard(this.name);
 
   @Index(type: IndexType.value)
-  Id id = Isar.autoIncrement; // you can also use id = null to auto increment
+  Id id = Isar.autoIncrement;
 
   final String name;
 }

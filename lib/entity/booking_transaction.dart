@@ -7,7 +7,7 @@ class BookingTransaction {
   BookingTransaction(this.roomId, this.guestId, this.keyCardId);
 
   @Index(type: IndexType.value)
-  Id id = Isar.autoIncrement; // you can also use id = null to auto increment
+  Id id = Isar.autoIncrement;
 
   final int roomId;
   final int guestId;
