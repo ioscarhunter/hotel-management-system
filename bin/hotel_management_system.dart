@@ -89,6 +89,16 @@ class Hotel {
   Future<String> getGuestByRoom(String roomNumber) {
     return repository.getGuestByRoom(roomNumber).then((guest) => guest.name);
   }
+
+  Future<String> checkOutByFloor(String floor) {
+    return repository.checkOutByFloor(floor).then((rooms) => 'Room ${rooms.format} are checkout.');
+  }
+
+  Future<String> checkInByFloor(String floor, String guestName, int age) {
+    return repository
+        .checkInByFloor(floor, guestName, age)
+        .then((result) => 'Room ${result.item2.format} are booked with keycard number ${result.item1.format}');
+  }
 }
 
 class Interpreter {
@@ -143,9 +153,9 @@ class Interpreter {
       case 'list_guest_by_floor':
         return hotel.getAllGuestByFloor(command[1]);
       case 'checkout_guest_by_floor':
-
+        return hotel.checkOutByFloor(command[1]);
       case 'book_by_floor':
-
+        return hotel.checkInByFloor(command[1], command[2], int.parse(command[3]));
       default:
         return Future.value('Command not found: ${command[0]}');
     }
