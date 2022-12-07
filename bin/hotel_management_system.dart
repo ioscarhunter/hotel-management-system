@@ -14,9 +14,15 @@ void main(List<String> arguments) async {
   final BookingDataRepository dataRepository = BookingDataRepository(localDataService);
   final BookingRepository repository = BookingRepository(dataRepository);
 
+  final Hotel hotel = Hotel(repository);
+  final FileReader fileReader = FileReader();
+  final Interpreter interpreter = Interpreter(hotel, fileReader);
+
   await localDataService.initIsar();
 
   await dataRepository.clearData();
+
+  await interpreter.readFromFileAndExecuteCommands(Directory.current.path + '\\input.txt');
 }
 
 class Hotel {
@@ -28,7 +34,7 @@ class Hotel {
     final List<Room> rooms = [];
     for (int floor = 1; floor <= floorCount; floor++) {
       for (int room = 1; room <= roomPerFloorCount; room++) {
-        rooms.add(Room('$room', '$floor'));
+        rooms.add(Room(room.toString().padLeft(2, '0'), '$floor'));
       }
     }
 
@@ -86,11 +92,39 @@ class Hotel {
 }
 
 class Interpreter {
-  Interpreter(this.hotel);
+  Interpreter(this.hotel, this.fileReader);
 
   final Hotel hotel;
+  final FileReader fileReader;
 
-  Future<String> convertCommand(List<String> command) async {
+  Future<void> readFromFileAndExecuteCommands(String path) {
+    return fileReader.readFile(path).then(executeCommands);
+  }
+
+  void executeCommands(List<String> lines) {
+    final List<List<String>> commands = lines.map((line) => line.split(' ')).toList();
+    try {
+      Future.forEach(commands, (command) async => await executeCommand(command));
+    } catch (exception) {
+      print(exception.toString());
+    }
+  }
+
+  Future<void> executeCommand(List<String> command) async {
+    try {
+      print(await convertCommand(command));
+    } catch (exception) {
+      if (exception is CastError) {
+        print('Data not found');
+      } else if (exception is RangeError) {
+        print('Command argument not valid');
+      } else {
+        print(exception.toString());
+      }
+    }
+  }
+
+  Future<String> convertCommand(List<String> command) {
     switch (command[0]) {
       case 'create_hotel':
         return hotel.initHotel(int.parse(command[1]), int.parse(command[2]));
@@ -113,14 +147,15 @@ class Interpreter {
       case 'book_by_floor':
 
       default:
-        return Future.value('Command not found${command[0]}');
+        return Future.value('Command not found: ${command[0]}');
     }
   }
 }
 
 class FileReader {
-  Future<String> readFile() {
-    final File file = File('../input.txt');
-    return file.readAsString();
+  Future<List<String>> readFile(String path) async {
+    final File file = File(path);
+
+    return file.readAsLines();
   }
 }
