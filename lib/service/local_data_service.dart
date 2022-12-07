@@ -7,9 +7,7 @@ import 'package:hotel_management_system/entity/room.dart';
 import 'package:isar/isar.dart';
 
 class LocalDataService {
-  LocalDataService() {
-    _initIsar();
-  }
+  LocalDataService();
 
   static const _name = 'LocalData';
 
@@ -24,7 +22,7 @@ class LocalDataService {
     RoomSchema,
   ];
 
-  Future<void> _initIsar() async {
+  Future<void> initIsar() async {
     _isar = await Isar.open(schemas, directory: Directory.current.path, name: _name);
   }
 }
