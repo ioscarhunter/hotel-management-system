@@ -1,3 +1,4 @@
+import 'package:hotel_management_system/entity/booking_transaction.dart';
 import 'package:isar/isar.dart';
 
 part 'guest.g.dart';
@@ -13,4 +14,7 @@ class Guest {
   final String name;
 
   final int age;
+
+  @Backlink(to: 'guest')
+  final IsarLinks<BookingTransaction> bookingTransaction = IsarLinks();
 }

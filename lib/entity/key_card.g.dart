@@ -17,13 +17,8 @@ const KeyCardSchema = CollectionSchema(
   name: r'KeyCard',
   id: -1640417581910657952,
   properties: {
-    r'bookingTransactionId': PropertySchema(
-      id: 0,
-      name: r'bookingTransactionId',
-      type: IsarType.long,
-    ),
     r'name': PropertySchema(
-      id: 1,
+      id: 0,
       name: r'name',
       type: IsarType.string,
     )
@@ -46,22 +41,17 @@ const KeyCardSchema = CollectionSchema(
           caseSensitive: true,
         )
       ],
-    ),
-    r'bookingTransactionId': IndexSchema(
-      id: 4948458780082013689,
-      name: r'bookingTransactionId',
-      unique: false,
-      replace: false,
-      properties: [
-        IndexPropertySchema(
-          name: r'bookingTransactionId',
-          type: IndexType.value,
-          caseSensitive: false,
-        )
-      ],
     )
   },
-  links: {},
+  links: {
+    r'bookingTransaction': LinkSchema(
+      id: -2900689118345541,
+      name: r'bookingTransaction',
+      target: r'BookingTransaction',
+      single: true,
+      linkName: r'keyCard',
+    )
+  },
   embeddedSchemas: {},
   getId: _keyCardGetId,
   getLinks: _keyCardGetLinks,
@@ -85,8 +75,7 @@ void _keyCardSerialize(
   List<int> offsets,
   Map<Type, List<int>> allOffsets,
 ) {
-  writer.writeLong(offsets[0], object.bookingTransactionId);
-  writer.writeString(offsets[1], object.name);
+  writer.writeString(offsets[0], object.name);
 }
 
 KeyCard _keyCardDeserialize(
@@ -96,9 +85,8 @@ KeyCard _keyCardDeserialize(
   Map<Type, List<int>> allOffsets,
 ) {
   final object = KeyCard(
-    reader.readString(offsets[1]),
+    reader.readString(offsets[0]),
   );
-  object.bookingTransactionId = reader.readLongOrNull(offsets[0]);
   object.id = id;
   return object;
 }
@@ -111,8 +99,6 @@ P _keyCardDeserializeProp<P>(
 ) {
   switch (propertyId) {
     case 0:
-      return (reader.readLongOrNull(offset)) as P;
-    case 1:
       return (reader.readString(offset)) as P;
     default:
       throw IsarError('Unknown property with id $propertyId');
@@ -124,11 +110,13 @@ Id _keyCardGetId(KeyCard object) {
 }
 
 List<IsarLinkBase<dynamic>> _keyCardGetLinks(KeyCard object) {
-  return [];
+  return [object.bookingTransaction];
 }
 
 void _keyCardAttach(IsarCollection<dynamic> col, Id id, KeyCard object) {
   object.id = id;
+  object.bookingTransaction.attach(col,
+      col.isar.collection<BookingTransaction>(), r'bookingTransaction', id);
 }
 
 extension KeyCardByIndex on IsarCollection<KeyCard> {
@@ -196,14 +184,6 @@ extension KeyCardQueryWhereSort on QueryBuilder<KeyCard, KeyCard, QWhere> {
     return QueryBuilder.apply(this, (query) {
       return query.addWhereClause(
         const IndexWhereClause.any(indexName: r'name'),
-      );
-    });
-  }
-
-  QueryBuilder<KeyCard, KeyCard, QAfterWhere> anyBookingTransactionId() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addWhereClause(
-        const IndexWhereClause.any(indexName: r'bookingTransactionId'),
       );
     });
   }
@@ -409,198 +389,10 @@ extension KeyCardQueryWhere on QueryBuilder<KeyCard, KeyCard, QWhereClause> {
       }
     });
   }
-
-  QueryBuilder<KeyCard, KeyCard, QAfterWhereClause>
-      bookingTransactionIdIsNull() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addWhereClause(IndexWhereClause.equalTo(
-        indexName: r'bookingTransactionId',
-        value: [null],
-      ));
-    });
-  }
-
-  QueryBuilder<KeyCard, KeyCard, QAfterWhereClause>
-      bookingTransactionIdIsNotNull() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addWhereClause(IndexWhereClause.between(
-        indexName: r'bookingTransactionId',
-        lower: [null],
-        includeLower: false,
-        upper: [],
-      ));
-    });
-  }
-
-  QueryBuilder<KeyCard, KeyCard, QAfterWhereClause> bookingTransactionIdEqualTo(
-      int? bookingTransactionId) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addWhereClause(IndexWhereClause.equalTo(
-        indexName: r'bookingTransactionId',
-        value: [bookingTransactionId],
-      ));
-    });
-  }
-
-  QueryBuilder<KeyCard, KeyCard, QAfterWhereClause>
-      bookingTransactionIdNotEqualTo(int? bookingTransactionId) {
-    return QueryBuilder.apply(this, (query) {
-      if (query.whereSort == Sort.asc) {
-        return query
-            .addWhereClause(IndexWhereClause.between(
-              indexName: r'bookingTransactionId',
-              lower: [],
-              upper: [bookingTransactionId],
-              includeUpper: false,
-            ))
-            .addWhereClause(IndexWhereClause.between(
-              indexName: r'bookingTransactionId',
-              lower: [bookingTransactionId],
-              includeLower: false,
-              upper: [],
-            ));
-      } else {
-        return query
-            .addWhereClause(IndexWhereClause.between(
-              indexName: r'bookingTransactionId',
-              lower: [bookingTransactionId],
-              includeLower: false,
-              upper: [],
-            ))
-            .addWhereClause(IndexWhereClause.between(
-              indexName: r'bookingTransactionId',
-              lower: [],
-              upper: [bookingTransactionId],
-              includeUpper: false,
-            ));
-      }
-    });
-  }
-
-  QueryBuilder<KeyCard, KeyCard, QAfterWhereClause>
-      bookingTransactionIdGreaterThan(
-    int? bookingTransactionId, {
-    bool include = false,
-  }) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addWhereClause(IndexWhereClause.between(
-        indexName: r'bookingTransactionId',
-        lower: [bookingTransactionId],
-        includeLower: include,
-        upper: [],
-      ));
-    });
-  }
-
-  QueryBuilder<KeyCard, KeyCard, QAfterWhereClause>
-      bookingTransactionIdLessThan(
-    int? bookingTransactionId, {
-    bool include = false,
-  }) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addWhereClause(IndexWhereClause.between(
-        indexName: r'bookingTransactionId',
-        lower: [],
-        upper: [bookingTransactionId],
-        includeUpper: include,
-      ));
-    });
-  }
-
-  QueryBuilder<KeyCard, KeyCard, QAfterWhereClause> bookingTransactionIdBetween(
-    int? lowerBookingTransactionId,
-    int? upperBookingTransactionId, {
-    bool includeLower = true,
-    bool includeUpper = true,
-  }) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addWhereClause(IndexWhereClause.between(
-        indexName: r'bookingTransactionId',
-        lower: [lowerBookingTransactionId],
-        includeLower: includeLower,
-        upper: [upperBookingTransactionId],
-        includeUpper: includeUpper,
-      ));
-    });
-  }
 }
 
 extension KeyCardQueryFilter
     on QueryBuilder<KeyCard, KeyCard, QFilterCondition> {
-  QueryBuilder<KeyCard, KeyCard, QAfterFilterCondition>
-      bookingTransactionIdIsNull() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(const FilterCondition.isNull(
-        property: r'bookingTransactionId',
-      ));
-    });
-  }
-
-  QueryBuilder<KeyCard, KeyCard, QAfterFilterCondition>
-      bookingTransactionIdIsNotNull() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(const FilterCondition.isNotNull(
-        property: r'bookingTransactionId',
-      ));
-    });
-  }
-
-  QueryBuilder<KeyCard, KeyCard, QAfterFilterCondition>
-      bookingTransactionIdEqualTo(int? value) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.equalTo(
-        property: r'bookingTransactionId',
-        value: value,
-      ));
-    });
-  }
-
-  QueryBuilder<KeyCard, KeyCard, QAfterFilterCondition>
-      bookingTransactionIdGreaterThan(
-    int? value, {
-    bool include = false,
-  }) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.greaterThan(
-        include: include,
-        property: r'bookingTransactionId',
-        value: value,
-      ));
-    });
-  }
-
-  QueryBuilder<KeyCard, KeyCard, QAfterFilterCondition>
-      bookingTransactionIdLessThan(
-    int? value, {
-    bool include = false,
-  }) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.lessThan(
-        include: include,
-        property: r'bookingTransactionId',
-        value: value,
-      ));
-    });
-  }
-
-  QueryBuilder<KeyCard, KeyCard, QAfterFilterCondition>
-      bookingTransactionIdBetween(
-    int? lower,
-    int? upper, {
-    bool includeLower = true,
-    bool includeUpper = true,
-  }) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.between(
-        property: r'bookingTransactionId',
-        lower: lower,
-        includeLower: includeLower,
-        upper: upper,
-        includeUpper: includeUpper,
-      ));
-    });
-  }
-
   QueryBuilder<KeyCard, KeyCard, QAfterFilterCondition> idEqualTo(Id value) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.equalTo(
@@ -788,22 +580,23 @@ extension KeyCardQueryObject
     on QueryBuilder<KeyCard, KeyCard, QFilterCondition> {}
 
 extension KeyCardQueryLinks
-    on QueryBuilder<KeyCard, KeyCard, QFilterCondition> {}
+    on QueryBuilder<KeyCard, KeyCard, QFilterCondition> {
+  QueryBuilder<KeyCard, KeyCard, QAfterFilterCondition> bookingTransaction(
+      FilterQuery<BookingTransaction> q) {
+    return QueryBuilder.apply(this, (query) {
+      return query.link(q, r'bookingTransaction');
+    });
+  }
+
+  QueryBuilder<KeyCard, KeyCard, QAfterFilterCondition>
+      bookingTransactionIsNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.linkLength(r'bookingTransaction', 0, true, 0, true);
+    });
+  }
+}
 
 extension KeyCardQuerySortBy on QueryBuilder<KeyCard, KeyCard, QSortBy> {
-  QueryBuilder<KeyCard, KeyCard, QAfterSortBy> sortByBookingTransactionId() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'bookingTransactionId', Sort.asc);
-    });
-  }
-
-  QueryBuilder<KeyCard, KeyCard, QAfterSortBy>
-      sortByBookingTransactionIdDesc() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'bookingTransactionId', Sort.desc);
-    });
-  }
-
   QueryBuilder<KeyCard, KeyCard, QAfterSortBy> sortByName() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'name', Sort.asc);
@@ -819,19 +612,6 @@ extension KeyCardQuerySortBy on QueryBuilder<KeyCard, KeyCard, QSortBy> {
 
 extension KeyCardQuerySortThenBy
     on QueryBuilder<KeyCard, KeyCard, QSortThenBy> {
-  QueryBuilder<KeyCard, KeyCard, QAfterSortBy> thenByBookingTransactionId() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'bookingTransactionId', Sort.asc);
-    });
-  }
-
-  QueryBuilder<KeyCard, KeyCard, QAfterSortBy>
-      thenByBookingTransactionIdDesc() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'bookingTransactionId', Sort.desc);
-    });
-  }
-
   QueryBuilder<KeyCard, KeyCard, QAfterSortBy> thenById() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'id', Sort.asc);
@@ -859,12 +639,6 @@ extension KeyCardQuerySortThenBy
 
 extension KeyCardQueryWhereDistinct
     on QueryBuilder<KeyCard, KeyCard, QDistinct> {
-  QueryBuilder<KeyCard, KeyCard, QDistinct> distinctByBookingTransactionId() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addDistinctBy(r'bookingTransactionId');
-    });
-  }
-
   QueryBuilder<KeyCard, KeyCard, QDistinct> distinctByName(
       {bool caseSensitive = true}) {
     return QueryBuilder.apply(this, (query) {
@@ -878,12 +652,6 @@ extension KeyCardQueryProperty
   QueryBuilder<KeyCard, int, QQueryOperations> idProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'id');
-    });
-  }
-
-  QueryBuilder<KeyCard, int?, QQueryOperations> bookingTransactionIdProperty() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addPropertyName(r'bookingTransactionId');
     });
   }
 

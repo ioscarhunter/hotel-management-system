@@ -48,7 +48,15 @@ const GuestSchema = CollectionSchema(
       ],
     )
   },
-  links: {},
+  links: {
+    r'bookingTransaction': LinkSchema(
+      id: 1975282813534763225,
+      name: r'bookingTransaction',
+      target: r'BookingTransaction',
+      single: false,
+      linkName: r'guest',
+    )
+  },
   embeddedSchemas: {},
   getId: _guestGetId,
   getLinks: _guestGetLinks,
@@ -111,11 +119,13 @@ Id _guestGetId(Guest object) {
 }
 
 List<IsarLinkBase<dynamic>> _guestGetLinks(Guest object) {
-  return [];
+  return [object.bookingTransaction];
 }
 
 void _guestAttach(IsarCollection<dynamic> col, Id id, Guest object) {
   object.id = id;
+  object.bookingTransaction.attach(col,
+      col.isar.collection<BookingTransaction>(), r'bookingTransaction', id);
 }
 
 extension GuestByIndex on IsarCollection<Guest> {
@@ -625,7 +635,70 @@ extension GuestQueryFilter on QueryBuilder<Guest, Guest, QFilterCondition> {
 
 extension GuestQueryObject on QueryBuilder<Guest, Guest, QFilterCondition> {}
 
-extension GuestQueryLinks on QueryBuilder<Guest, Guest, QFilterCondition> {}
+extension GuestQueryLinks on QueryBuilder<Guest, Guest, QFilterCondition> {
+  QueryBuilder<Guest, Guest, QAfterFilterCondition> bookingTransaction(
+      FilterQuery<BookingTransaction> q) {
+    return QueryBuilder.apply(this, (query) {
+      return query.link(q, r'bookingTransaction');
+    });
+  }
+
+  QueryBuilder<Guest, Guest, QAfterFilterCondition>
+      bookingTransactionLengthEqualTo(int length) {
+    return QueryBuilder.apply(this, (query) {
+      return query.linkLength(
+          r'bookingTransaction', length, true, length, true);
+    });
+  }
+
+  QueryBuilder<Guest, Guest, QAfterFilterCondition>
+      bookingTransactionIsEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.linkLength(r'bookingTransaction', 0, true, 0, true);
+    });
+  }
+
+  QueryBuilder<Guest, Guest, QAfterFilterCondition>
+      bookingTransactionIsNotEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.linkLength(r'bookingTransaction', 0, false, 999999, true);
+    });
+  }
+
+  QueryBuilder<Guest, Guest, QAfterFilterCondition>
+      bookingTransactionLengthLessThan(
+    int length, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.linkLength(r'bookingTransaction', 0, true, length, include);
+    });
+  }
+
+  QueryBuilder<Guest, Guest, QAfterFilterCondition>
+      bookingTransactionLengthGreaterThan(
+    int length, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.linkLength(
+          r'bookingTransaction', length, include, 999999, true);
+    });
+  }
+
+  QueryBuilder<Guest, Guest, QAfterFilterCondition>
+      bookingTransactionLengthBetween(
+    int lower,
+    int upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.linkLength(
+          r'bookingTransaction', lower, includeLower, upper, includeUpper);
+    });
+  }
+}
 
 extension GuestQuerySortBy on QueryBuilder<Guest, Guest, QSortBy> {
   QueryBuilder<Guest, Guest, QAfterSortBy> sortByAge() {

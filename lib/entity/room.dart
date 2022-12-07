@@ -1,3 +1,4 @@
+import 'package:hotel_management_system/entity/booking_transaction.dart';
 import 'package:isar/isar.dart';
 import 'package:tuple/tuple.dart';
 
@@ -16,8 +17,8 @@ class Room {
 
   String get roomName => floor + number;
 
-  @Index(type: IndexType.value)
-  int? bookingTransactionId;
+  @Backlink(to: 'room')
+  final IsarLink<BookingTransaction> bookingTransaction = IsarLink();
 
   @override
   String toString() => roomName;
