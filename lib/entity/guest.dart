@@ -9,6 +9,7 @@ class Guest {
   @Index(type: IndexType.value)
   Id id = Isar.autoIncrement;
 
+  @Index(type: IndexType.value, unique: true)
   final String name;
 
   final int age;

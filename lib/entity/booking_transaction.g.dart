@@ -52,6 +52,32 @@ const BookingTransactionSchema = CollectionSchema(
           caseSensitive: false,
         )
       ],
+    ),
+    r'guestId': IndexSchema(
+      id: -1165547279921219597,
+      name: r'guestId',
+      unique: false,
+      replace: false,
+      properties: [
+        IndexPropertySchema(
+          name: r'guestId',
+          type: IndexType.value,
+          caseSensitive: false,
+        )
+      ],
+    ),
+    r'keyCardId': IndexSchema(
+      id: 5114355412819716220,
+      name: r'keyCardId',
+      unique: true,
+      replace: false,
+      properties: [
+        IndexPropertySchema(
+          name: r'keyCardId',
+          type: IndexType.value,
+          caseSensitive: false,
+        )
+      ],
     )
   },
   links: {},
@@ -182,6 +208,60 @@ extension BookingTransactionByIndex on IsarCollection<BookingTransaction> {
       {bool saveLinks = true}) {
     return putAllByIndexSync(r'roomId', objects, saveLinks: saveLinks);
   }
+
+  Future<BookingTransaction?> getByKeyCardId(int keyCardId) {
+    return getByIndex(r'keyCardId', [keyCardId]);
+  }
+
+  BookingTransaction? getByKeyCardIdSync(int keyCardId) {
+    return getByIndexSync(r'keyCardId', [keyCardId]);
+  }
+
+  Future<bool> deleteByKeyCardId(int keyCardId) {
+    return deleteByIndex(r'keyCardId', [keyCardId]);
+  }
+
+  bool deleteByKeyCardIdSync(int keyCardId) {
+    return deleteByIndexSync(r'keyCardId', [keyCardId]);
+  }
+
+  Future<List<BookingTransaction?>> getAllByKeyCardId(
+      List<int> keyCardIdValues) {
+    final values = keyCardIdValues.map((e) => [e]).toList();
+    return getAllByIndex(r'keyCardId', values);
+  }
+
+  List<BookingTransaction?> getAllByKeyCardIdSync(List<int> keyCardIdValues) {
+    final values = keyCardIdValues.map((e) => [e]).toList();
+    return getAllByIndexSync(r'keyCardId', values);
+  }
+
+  Future<int> deleteAllByKeyCardId(List<int> keyCardIdValues) {
+    final values = keyCardIdValues.map((e) => [e]).toList();
+    return deleteAllByIndex(r'keyCardId', values);
+  }
+
+  int deleteAllByKeyCardIdSync(List<int> keyCardIdValues) {
+    final values = keyCardIdValues.map((e) => [e]).toList();
+    return deleteAllByIndexSync(r'keyCardId', values);
+  }
+
+  Future<Id> putByKeyCardId(BookingTransaction object) {
+    return putByIndex(r'keyCardId', object);
+  }
+
+  Id putByKeyCardIdSync(BookingTransaction object, {bool saveLinks = true}) {
+    return putByIndexSync(r'keyCardId', object, saveLinks: saveLinks);
+  }
+
+  Future<List<Id>> putAllByKeyCardId(List<BookingTransaction> objects) {
+    return putAllByIndex(r'keyCardId', objects);
+  }
+
+  List<Id> putAllByKeyCardIdSync(List<BookingTransaction> objects,
+      {bool saveLinks = true}) {
+    return putAllByIndexSync(r'keyCardId', objects, saveLinks: saveLinks);
+  }
 }
 
 extension BookingTransactionQueryWhereSort
@@ -197,6 +277,24 @@ extension BookingTransactionQueryWhereSort
     return QueryBuilder.apply(this, (query) {
       return query.addWhereClause(
         const IndexWhereClause.any(indexName: r'roomId'),
+      );
+    });
+  }
+
+  QueryBuilder<BookingTransaction, BookingTransaction, QAfterWhere>
+      anyGuestId() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addWhereClause(
+        const IndexWhereClause.any(indexName: r'guestId'),
+      );
+    });
+  }
+
+  QueryBuilder<BookingTransaction, BookingTransaction, QAfterWhere>
+      anyKeyCardId() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addWhereClause(
+        const IndexWhereClause.any(indexName: r'keyCardId'),
       );
     });
   }
@@ -360,6 +458,192 @@ extension BookingTransactionQueryWhere
         lower: [lowerRoomId],
         includeLower: includeLower,
         upper: [upperRoomId],
+        includeUpper: includeUpper,
+      ));
+    });
+  }
+
+  QueryBuilder<BookingTransaction, BookingTransaction, QAfterWhereClause>
+      guestIdEqualTo(int guestId) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addWhereClause(IndexWhereClause.equalTo(
+        indexName: r'guestId',
+        value: [guestId],
+      ));
+    });
+  }
+
+  QueryBuilder<BookingTransaction, BookingTransaction, QAfterWhereClause>
+      guestIdNotEqualTo(int guestId) {
+    return QueryBuilder.apply(this, (query) {
+      if (query.whereSort == Sort.asc) {
+        return query
+            .addWhereClause(IndexWhereClause.between(
+              indexName: r'guestId',
+              lower: [],
+              upper: [guestId],
+              includeUpper: false,
+            ))
+            .addWhereClause(IndexWhereClause.between(
+              indexName: r'guestId',
+              lower: [guestId],
+              includeLower: false,
+              upper: [],
+            ));
+      } else {
+        return query
+            .addWhereClause(IndexWhereClause.between(
+              indexName: r'guestId',
+              lower: [guestId],
+              includeLower: false,
+              upper: [],
+            ))
+            .addWhereClause(IndexWhereClause.between(
+              indexName: r'guestId',
+              lower: [],
+              upper: [guestId],
+              includeUpper: false,
+            ));
+      }
+    });
+  }
+
+  QueryBuilder<BookingTransaction, BookingTransaction, QAfterWhereClause>
+      guestIdGreaterThan(
+    int guestId, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addWhereClause(IndexWhereClause.between(
+        indexName: r'guestId',
+        lower: [guestId],
+        includeLower: include,
+        upper: [],
+      ));
+    });
+  }
+
+  QueryBuilder<BookingTransaction, BookingTransaction, QAfterWhereClause>
+      guestIdLessThan(
+    int guestId, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addWhereClause(IndexWhereClause.between(
+        indexName: r'guestId',
+        lower: [],
+        upper: [guestId],
+        includeUpper: include,
+      ));
+    });
+  }
+
+  QueryBuilder<BookingTransaction, BookingTransaction, QAfterWhereClause>
+      guestIdBetween(
+    int lowerGuestId,
+    int upperGuestId, {
+    bool includeLower = true,
+    bool includeUpper = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addWhereClause(IndexWhereClause.between(
+        indexName: r'guestId',
+        lower: [lowerGuestId],
+        includeLower: includeLower,
+        upper: [upperGuestId],
+        includeUpper: includeUpper,
+      ));
+    });
+  }
+
+  QueryBuilder<BookingTransaction, BookingTransaction, QAfterWhereClause>
+      keyCardIdEqualTo(int keyCardId) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addWhereClause(IndexWhereClause.equalTo(
+        indexName: r'keyCardId',
+        value: [keyCardId],
+      ));
+    });
+  }
+
+  QueryBuilder<BookingTransaction, BookingTransaction, QAfterWhereClause>
+      keyCardIdNotEqualTo(int keyCardId) {
+    return QueryBuilder.apply(this, (query) {
+      if (query.whereSort == Sort.asc) {
+        return query
+            .addWhereClause(IndexWhereClause.between(
+              indexName: r'keyCardId',
+              lower: [],
+              upper: [keyCardId],
+              includeUpper: false,
+            ))
+            .addWhereClause(IndexWhereClause.between(
+              indexName: r'keyCardId',
+              lower: [keyCardId],
+              includeLower: false,
+              upper: [],
+            ));
+      } else {
+        return query
+            .addWhereClause(IndexWhereClause.between(
+              indexName: r'keyCardId',
+              lower: [keyCardId],
+              includeLower: false,
+              upper: [],
+            ))
+            .addWhereClause(IndexWhereClause.between(
+              indexName: r'keyCardId',
+              lower: [],
+              upper: [keyCardId],
+              includeUpper: false,
+            ));
+      }
+    });
+  }
+
+  QueryBuilder<BookingTransaction, BookingTransaction, QAfterWhereClause>
+      keyCardIdGreaterThan(
+    int keyCardId, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addWhereClause(IndexWhereClause.between(
+        indexName: r'keyCardId',
+        lower: [keyCardId],
+        includeLower: include,
+        upper: [],
+      ));
+    });
+  }
+
+  QueryBuilder<BookingTransaction, BookingTransaction, QAfterWhereClause>
+      keyCardIdLessThan(
+    int keyCardId, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addWhereClause(IndexWhereClause.between(
+        indexName: r'keyCardId',
+        lower: [],
+        upper: [keyCardId],
+        includeUpper: include,
+      ));
+    });
+  }
+
+  QueryBuilder<BookingTransaction, BookingTransaction, QAfterWhereClause>
+      keyCardIdBetween(
+    int lowerKeyCardId,
+    int upperKeyCardId, {
+    bool includeLower = true,
+    bool includeUpper = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addWhereClause(IndexWhereClause.between(
+        indexName: r'keyCardId',
+        lower: [lowerKeyCardId],
+        includeLower: includeLower,
+        upper: [upperKeyCardId],
         includeUpper: includeUpper,
       ));
     });

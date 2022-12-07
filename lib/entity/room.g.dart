@@ -17,18 +17,23 @@ const RoomSchema = CollectionSchema(
   name: r'Room',
   id: -1093513927825131211,
   properties: {
-    r'floor': PropertySchema(
+    r'bookingTransactionId': PropertySchema(
       id: 0,
+      name: r'bookingTransactionId',
+      type: IsarType.long,
+    ),
+    r'floor': PropertySchema(
+      id: 1,
       name: r'floor',
       type: IsarType.string,
     ),
     r'number': PropertySchema(
-      id: 1,
+      id: 2,
       name: r'number',
       type: IsarType.string,
     ),
     r'roomName': PropertySchema(
-      id: 2,
+      id: 3,
       name: r'roomName',
       type: IsarType.string,
     )
@@ -38,7 +43,21 @@ const RoomSchema = CollectionSchema(
   deserialize: _roomDeserialize,
   deserializeProp: _roomDeserializeProp,
   idName: r'id',
-  indexes: {},
+  indexes: {
+    r'bookingTransactionId': IndexSchema(
+      id: 4948458780082013689,
+      name: r'bookingTransactionId',
+      unique: true,
+      replace: false,
+      properties: [
+        IndexPropertySchema(
+          name: r'bookingTransactionId',
+          type: IndexType.value,
+          caseSensitive: false,
+        )
+      ],
+    )
+  },
   links: {},
   embeddedSchemas: {},
   getId: _roomGetId,
@@ -65,9 +84,10 @@ void _roomSerialize(
   List<int> offsets,
   Map<Type, List<int>> allOffsets,
 ) {
-  writer.writeString(offsets[0], object.floor);
-  writer.writeString(offsets[1], object.number);
-  writer.writeString(offsets[2], object.roomName);
+  writer.writeLong(offsets[0], object.bookingTransactionId);
+  writer.writeString(offsets[1], object.floor);
+  writer.writeString(offsets[2], object.number);
+  writer.writeString(offsets[3], object.roomName);
 }
 
 Room _roomDeserialize(
@@ -77,9 +97,10 @@ Room _roomDeserialize(
   Map<Type, List<int>> allOffsets,
 ) {
   final object = Room(
+    reader.readString(offsets[2]),
     reader.readString(offsets[1]),
-    reader.readString(offsets[0]),
   );
+  object.bookingTransactionId = reader.readLongOrNull(offsets[0]);
   object.id = id;
   return object;
 }
@@ -92,10 +113,12 @@ P _roomDeserializeProp<P>(
 ) {
   switch (propertyId) {
     case 0:
-      return (reader.readString(offset)) as P;
+      return (reader.readLongOrNull(offset)) as P;
     case 1:
       return (reader.readString(offset)) as P;
     case 2:
+      return (reader.readString(offset)) as P;
+    case 3:
       return (reader.readString(offset)) as P;
     default:
       throw IsarError('Unknown property with id $propertyId');
@@ -114,10 +137,79 @@ void _roomAttach(IsarCollection<dynamic> col, Id id, Room object) {
   object.id = id;
 }
 
+extension RoomByIndex on IsarCollection<Room> {
+  Future<Room?> getByBookingTransactionId(int? bookingTransactionId) {
+    return getByIndex(r'bookingTransactionId', [bookingTransactionId]);
+  }
+
+  Room? getByBookingTransactionIdSync(int? bookingTransactionId) {
+    return getByIndexSync(r'bookingTransactionId', [bookingTransactionId]);
+  }
+
+  Future<bool> deleteByBookingTransactionId(int? bookingTransactionId) {
+    return deleteByIndex(r'bookingTransactionId', [bookingTransactionId]);
+  }
+
+  bool deleteByBookingTransactionIdSync(int? bookingTransactionId) {
+    return deleteByIndexSync(r'bookingTransactionId', [bookingTransactionId]);
+  }
+
+  Future<List<Room?>> getAllByBookingTransactionId(
+      List<int?> bookingTransactionIdValues) {
+    final values = bookingTransactionIdValues.map((e) => [e]).toList();
+    return getAllByIndex(r'bookingTransactionId', values);
+  }
+
+  List<Room?> getAllByBookingTransactionIdSync(
+      List<int?> bookingTransactionIdValues) {
+    final values = bookingTransactionIdValues.map((e) => [e]).toList();
+    return getAllByIndexSync(r'bookingTransactionId', values);
+  }
+
+  Future<int> deleteAllByBookingTransactionId(
+      List<int?> bookingTransactionIdValues) {
+    final values = bookingTransactionIdValues.map((e) => [e]).toList();
+    return deleteAllByIndex(r'bookingTransactionId', values);
+  }
+
+  int deleteAllByBookingTransactionIdSync(
+      List<int?> bookingTransactionIdValues) {
+    final values = bookingTransactionIdValues.map((e) => [e]).toList();
+    return deleteAllByIndexSync(r'bookingTransactionId', values);
+  }
+
+  Future<Id> putByBookingTransactionId(Room object) {
+    return putByIndex(r'bookingTransactionId', object);
+  }
+
+  Id putByBookingTransactionIdSync(Room object, {bool saveLinks = true}) {
+    return putByIndexSync(r'bookingTransactionId', object,
+        saveLinks: saveLinks);
+  }
+
+  Future<List<Id>> putAllByBookingTransactionId(List<Room> objects) {
+    return putAllByIndex(r'bookingTransactionId', objects);
+  }
+
+  List<Id> putAllByBookingTransactionIdSync(List<Room> objects,
+      {bool saveLinks = true}) {
+    return putAllByIndexSync(r'bookingTransactionId', objects,
+        saveLinks: saveLinks);
+  }
+}
+
 extension RoomQueryWhereSort on QueryBuilder<Room, Room, QWhere> {
   QueryBuilder<Room, Room, QAfterWhere> anyId() {
     return QueryBuilder.apply(this, (query) {
       return query.addWhereClause(const IdWhereClause.any());
+    });
+  }
+
+  QueryBuilder<Room, Room, QAfterWhere> anyBookingTransactionId() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addWhereClause(
+        const IndexWhereClause.any(indexName: r'bookingTransactionId'),
+      );
     });
   }
 }
@@ -187,9 +279,190 @@ extension RoomQueryWhere on QueryBuilder<Room, Room, QWhereClause> {
       ));
     });
   }
+
+  QueryBuilder<Room, Room, QAfterWhereClause> bookingTransactionIdIsNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addWhereClause(IndexWhereClause.equalTo(
+        indexName: r'bookingTransactionId',
+        value: [null],
+      ));
+    });
+  }
+
+  QueryBuilder<Room, Room, QAfterWhereClause> bookingTransactionIdIsNotNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addWhereClause(IndexWhereClause.between(
+        indexName: r'bookingTransactionId',
+        lower: [null],
+        includeLower: false,
+        upper: [],
+      ));
+    });
+  }
+
+  QueryBuilder<Room, Room, QAfterWhereClause> bookingTransactionIdEqualTo(
+      int? bookingTransactionId) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addWhereClause(IndexWhereClause.equalTo(
+        indexName: r'bookingTransactionId',
+        value: [bookingTransactionId],
+      ));
+    });
+  }
+
+  QueryBuilder<Room, Room, QAfterWhereClause> bookingTransactionIdNotEqualTo(
+      int? bookingTransactionId) {
+    return QueryBuilder.apply(this, (query) {
+      if (query.whereSort == Sort.asc) {
+        return query
+            .addWhereClause(IndexWhereClause.between(
+              indexName: r'bookingTransactionId',
+              lower: [],
+              upper: [bookingTransactionId],
+              includeUpper: false,
+            ))
+            .addWhereClause(IndexWhereClause.between(
+              indexName: r'bookingTransactionId',
+              lower: [bookingTransactionId],
+              includeLower: false,
+              upper: [],
+            ));
+      } else {
+        return query
+            .addWhereClause(IndexWhereClause.between(
+              indexName: r'bookingTransactionId',
+              lower: [bookingTransactionId],
+              includeLower: false,
+              upper: [],
+            ))
+            .addWhereClause(IndexWhereClause.between(
+              indexName: r'bookingTransactionId',
+              lower: [],
+              upper: [bookingTransactionId],
+              includeUpper: false,
+            ));
+      }
+    });
+  }
+
+  QueryBuilder<Room, Room, QAfterWhereClause> bookingTransactionIdGreaterThan(
+    int? bookingTransactionId, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addWhereClause(IndexWhereClause.between(
+        indexName: r'bookingTransactionId',
+        lower: [bookingTransactionId],
+        includeLower: include,
+        upper: [],
+      ));
+    });
+  }
+
+  QueryBuilder<Room, Room, QAfterWhereClause> bookingTransactionIdLessThan(
+    int? bookingTransactionId, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addWhereClause(IndexWhereClause.between(
+        indexName: r'bookingTransactionId',
+        lower: [],
+        upper: [bookingTransactionId],
+        includeUpper: include,
+      ));
+    });
+  }
+
+  QueryBuilder<Room, Room, QAfterWhereClause> bookingTransactionIdBetween(
+    int? lowerBookingTransactionId,
+    int? upperBookingTransactionId, {
+    bool includeLower = true,
+    bool includeUpper = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addWhereClause(IndexWhereClause.between(
+        indexName: r'bookingTransactionId',
+        lower: [lowerBookingTransactionId],
+        includeLower: includeLower,
+        upper: [upperBookingTransactionId],
+        includeUpper: includeUpper,
+      ));
+    });
+  }
 }
 
 extension RoomQueryFilter on QueryBuilder<Room, Room, QFilterCondition> {
+  QueryBuilder<Room, Room, QAfterFilterCondition> bookingTransactionIdIsNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNull(
+        property: r'bookingTransactionId',
+      ));
+    });
+  }
+
+  QueryBuilder<Room, Room, QAfterFilterCondition>
+      bookingTransactionIdIsNotNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNotNull(
+        property: r'bookingTransactionId',
+      ));
+    });
+  }
+
+  QueryBuilder<Room, Room, QAfterFilterCondition> bookingTransactionIdEqualTo(
+      int? value) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'bookingTransactionId',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<Room, Room, QAfterFilterCondition>
+      bookingTransactionIdGreaterThan(
+    int? value, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        include: include,
+        property: r'bookingTransactionId',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<Room, Room, QAfterFilterCondition> bookingTransactionIdLessThan(
+    int? value, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.lessThan(
+        include: include,
+        property: r'bookingTransactionId',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<Room, Room, QAfterFilterCondition> bookingTransactionIdBetween(
+    int? lower,
+    int? upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.between(
+        property: r'bookingTransactionId',
+        lower: lower,
+        includeLower: includeLower,
+        upper: upper,
+        includeUpper: includeUpper,
+      ));
+    });
+  }
+
   QueryBuilder<Room, Room, QAfterFilterCondition> floorEqualTo(
     String value, {
     bool caseSensitive = true,
@@ -633,6 +906,18 @@ extension RoomQueryObject on QueryBuilder<Room, Room, QFilterCondition> {}
 extension RoomQueryLinks on QueryBuilder<Room, Room, QFilterCondition> {}
 
 extension RoomQuerySortBy on QueryBuilder<Room, Room, QSortBy> {
+  QueryBuilder<Room, Room, QAfterSortBy> sortByBookingTransactionId() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'bookingTransactionId', Sort.asc);
+    });
+  }
+
+  QueryBuilder<Room, Room, QAfterSortBy> sortByBookingTransactionIdDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'bookingTransactionId', Sort.desc);
+    });
+  }
+
   QueryBuilder<Room, Room, QAfterSortBy> sortByFloor() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'floor', Sort.asc);
@@ -671,6 +956,18 @@ extension RoomQuerySortBy on QueryBuilder<Room, Room, QSortBy> {
 }
 
 extension RoomQuerySortThenBy on QueryBuilder<Room, Room, QSortThenBy> {
+  QueryBuilder<Room, Room, QAfterSortBy> thenByBookingTransactionId() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'bookingTransactionId', Sort.asc);
+    });
+  }
+
+  QueryBuilder<Room, Room, QAfterSortBy> thenByBookingTransactionIdDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'bookingTransactionId', Sort.desc);
+    });
+  }
+
   QueryBuilder<Room, Room, QAfterSortBy> thenByFloor() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'floor', Sort.asc);
@@ -721,6 +1018,12 @@ extension RoomQuerySortThenBy on QueryBuilder<Room, Room, QSortThenBy> {
 }
 
 extension RoomQueryWhereDistinct on QueryBuilder<Room, Room, QDistinct> {
+  QueryBuilder<Room, Room, QDistinct> distinctByBookingTransactionId() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'bookingTransactionId');
+    });
+  }
+
   QueryBuilder<Room, Room, QDistinct> distinctByFloor(
       {bool caseSensitive = true}) {
     return QueryBuilder.apply(this, (query) {
@@ -747,6 +1050,12 @@ extension RoomQueryProperty on QueryBuilder<Room, Room, QQueryProperty> {
   QueryBuilder<Room, int, QQueryOperations> idProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'id');
+    });
+  }
+
+  QueryBuilder<Room, int?, QQueryOperations> bookingTransactionIdProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'bookingTransactionId');
     });
   }
 

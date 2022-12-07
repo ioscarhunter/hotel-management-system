@@ -11,6 +11,8 @@ class BookingTransaction {
 
   @Index(type: IndexType.value, unique: true)
   final int roomId;
+  @Index(type: IndexType.value)
   final int guestId;
+  @Index(type: IndexType.value, unique: true)
   final int keyCardId;
 }

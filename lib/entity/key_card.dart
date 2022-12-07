@@ -9,7 +9,9 @@ class KeyCard {
   @Index(type: IndexType.value)
   Id id = Isar.autoIncrement;
 
+  @Index(type: IndexType.value, unique: true)
   final String name;
 
+  @Index(type: IndexType.value, unique: true)
   int? bookingTransactionId;
 }
