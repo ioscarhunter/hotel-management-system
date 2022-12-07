@@ -4,6 +4,7 @@ import 'package:hotel_management_system/entity/guest.dart';
 import 'package:hotel_management_system/entity/key_card.dart';
 import 'package:hotel_management_system/entity/room.dart';
 import 'package:hotel_management_system/repository/booking_data_repository.dart';
+import 'package:tuple/tuple.dart';
 
 class BookingRepository {
   BookingRepository(this.dataRepository);
@@ -75,6 +76,24 @@ class BookingRepository {
 
   Future<Guest> getGuestByRoom(String roomNumber) {
     return dataRepository.getGuestByRoom(roomNumber);
+  }
+
+  Future<List<Room>> checkOutByFloor(String floor) {
+    return dataRepository.deleteBookingTransactionByFloor(floor);
+  }
+
+  Future<Tuple2<List<KeyCard>, List<Room>>> checkInByFloor(String floor, String guestName, int age) async {
+    if (!await dataRepository.isFloorAvailable(floor)) {
+      throw FloorNotAvailableException(floor, guestName);
+    }
+    final List<Room> roomsByFloor = await dataRepository.getRoomByFloor(floor);
+
+    await dataRepository.getNumberOfUnoccupiedKeyCard(roomsByFloor.length);
+
+    final Guest bookingGuest = await dataRepository.createGuest(guestName, age);
+
+    final List<KeyCard> keyCards = await dataRepository.createBookingTransactions(bookingGuest, roomsByFloor);
+    return Tuple2(keyCards, roomsByFloor);
   }
 
   Future<void> clearData() {

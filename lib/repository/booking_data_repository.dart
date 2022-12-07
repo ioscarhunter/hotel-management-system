@@ -43,34 +43,63 @@ class BookingDataRepository {
     Room room,
   ) {
     return localDataService.isar.writeTxn(() async {
-      final BookingTransaction bookingTransaction = BookingTransaction();
-      final int bookingId = await bookingTransactions.put(bookingTransaction);
-
-      bookingTransaction.guest.value = guest;
-      await bookingTransaction.guest.save();
-      bookingTransaction.keyCard.value = keyCard;
-      await bookingTransaction.keyCard.save();
-      bookingTransaction.room.value = room;
-      await bookingTransaction.room.save();
-
-      // await Future.wait([
-      //   keyCards.put(keyCard..bookingTransactionId = bookingId),
-      //   rooms.put(room..bookingTransactionId = bookingId),
-      // ]);
+      BookingTransaction bookingTransaction = await _writeBooking(guest, keyCard, room);
       return bookingTransaction.keyCard.value!;
     });
+  }
+
+  Future<BookingTransaction> _writeBooking(Guest guest, KeyCard keyCard, Room room) async {
+    final BookingTransaction bookingTransaction = BookingTransaction();
+    await bookingTransactions.put(bookingTransaction);
+
+    bookingTransaction.guest.value = guest;
+    await bookingTransaction.guest.save();
+    bookingTransaction.keyCard.value = keyCard;
+    await bookingTransaction.keyCard.save();
+    bookingTransaction.room.value = room;
+    await bookingTransaction.room.save();
+
+    return bookingTransaction;
+  }
+
+  Future<List<KeyCard>> createBookingTransactions(
+    Guest guest,
+    List<Room> rooms,
+  ) {
+    return localDataService.isar.writeTxn(() async {
+      final List<KeyCard> result = [];
+      for (Room room in rooms) {
+        final KeyCard keyCard = await getFirstUnoccupiedKeyCard();
+        await _writeBooking(guest, keyCard, room);
+        result.add(keyCard);
+      }
+      return result;
+    });
+  }
+
+  Future<bool> isFloorAvailable(String floor) {
+    return bookingTransactions.filter().room((q) => q.floorEqualTo(floor)).findAll().then((rooms) => rooms.isEmpty);
   }
 
   Future<Room> deleteBookingTransaction(BookingTransaction bookingTransaction, KeyCard keyCard) async {
     final Room room = bookingTransaction.room.value!;
     await localDataService.isar.writeTxn(() {
-      return Future.wait([
-        bookingTransactions.delete(bookingTransaction.id),
-        // keyCards.put(keyCard..bookingTransactionId = null),
-        // rooms.put(room.bookingTransaction.value = null),
-      ]);
+      return bookingTransactions.delete(bookingTransaction.id);
     });
     return room;
+  }
+
+  Future<List<Room>> deleteBookingTransactionByFloor(String floor) async {
+    final List<BookingTransaction> bookingsToDelete =
+        await bookingTransactions.filter().room((q) => q.floorEqualTo(floor)).findAll();
+
+    final List<Room> rooms = bookingsToDelete.map((booking) => booking.room.value!).toList();
+
+    await localDataService.isar.writeTxn(() {
+      return bookingTransactions.deleteAll(bookingsToDelete.map((booking) => booking.id).toList());
+    });
+
+    return rooms;
   }
 
   Future<BookingTransaction?> getBookingTransactionByRoomId(int roomId) {
@@ -78,7 +107,6 @@ class BookingDataRepository {
   }
 
   Future<BookingTransaction> getBookingTransactionByKeyCardName(String keyCardName) async {
-    // KeyCard keyCard = await getKeyCardByName(keyCardName);
     return bookingTransactions.filter().keyCard((q) => q.nameEqualTo(keyCardName)).findFirst().then((value) => value!);
   }
 
@@ -113,6 +141,10 @@ class BookingDataRepository {
     return rooms.get(id).then((value) => value!);
   }
 
+  Future<List<Room>> getRoomByFloor(String floor) {
+    return rooms.filter().floorEqualTo(floor).findAll();
+  }
+
   Future<KeyCard> getKeyCardById(int id) {
     return keyCards.get(id).then((value) => value!);
   }
@@ -122,9 +154,21 @@ class BookingDataRepository {
   }
 
   Future<KeyCard> getFirstUnoccupiedKeyCard() {
-    return keyCards.filter().bookingTransactionIsNull().findFirst().then((value) {
-      if (value == null) throw RoomFullException();
-      return value;
+    return keyCards.filter().bookingTransactionIsNull().findFirst().then((keyCard) {
+      if (keyCard == null) throw RoomFullException();
+      return keyCard;
+    });
+  }
+
+  Future<List<KeyCard>> getNumberOfUnoccupiedKeyCard(int count) {
+    return keyCards
+        .filter()
+        .bookingTransactionIsNull()
+        .findAll()
+        .then((keyCards) => keyCards.take(count).toList())
+        .then((keyCards) {
+      if (keyCards.length != count) throw RoomFullException();
+      return keyCards;
     });
   }
 

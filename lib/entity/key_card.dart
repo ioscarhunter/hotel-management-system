@@ -15,4 +15,7 @@ class KeyCard {
 
   @Backlink(to: 'keyCard')
   final IsarLink<BookingTransaction> bookingTransaction = IsarLink();
+
+  @override
+  String toString() => name;
 }
