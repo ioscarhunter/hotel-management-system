@@ -39,7 +39,21 @@ const BookingTransactionSchema = CollectionSchema(
   deserialize: _bookingTransactionDeserialize,
   deserializeProp: _bookingTransactionDeserializeProp,
   idName: r'id',
-  indexes: {},
+  indexes: {
+    r'roomId': IndexSchema(
+      id: -3609232324653216207,
+      name: r'roomId',
+      unique: true,
+      replace: false,
+      properties: [
+        IndexPropertySchema(
+          name: r'roomId',
+          type: IndexType.value,
+          caseSensitive: false,
+        )
+      ],
+    )
+  },
   links: {},
   embeddedSchemas: {},
   getId: _bookingTransactionGetId,
@@ -115,11 +129,75 @@ void _bookingTransactionAttach(
   object.id = id;
 }
 
+extension BookingTransactionByIndex on IsarCollection<BookingTransaction> {
+  Future<BookingTransaction?> getByRoomId(int roomId) {
+    return getByIndex(r'roomId', [roomId]);
+  }
+
+  BookingTransaction? getByRoomIdSync(int roomId) {
+    return getByIndexSync(r'roomId', [roomId]);
+  }
+
+  Future<bool> deleteByRoomId(int roomId) {
+    return deleteByIndex(r'roomId', [roomId]);
+  }
+
+  bool deleteByRoomIdSync(int roomId) {
+    return deleteByIndexSync(r'roomId', [roomId]);
+  }
+
+  Future<List<BookingTransaction?>> getAllByRoomId(List<int> roomIdValues) {
+    final values = roomIdValues.map((e) => [e]).toList();
+    return getAllByIndex(r'roomId', values);
+  }
+
+  List<BookingTransaction?> getAllByRoomIdSync(List<int> roomIdValues) {
+    final values = roomIdValues.map((e) => [e]).toList();
+    return getAllByIndexSync(r'roomId', values);
+  }
+
+  Future<int> deleteAllByRoomId(List<int> roomIdValues) {
+    final values = roomIdValues.map((e) => [e]).toList();
+    return deleteAllByIndex(r'roomId', values);
+  }
+
+  int deleteAllByRoomIdSync(List<int> roomIdValues) {
+    final values = roomIdValues.map((e) => [e]).toList();
+    return deleteAllByIndexSync(r'roomId', values);
+  }
+
+  Future<Id> putByRoomId(BookingTransaction object) {
+    return putByIndex(r'roomId', object);
+  }
+
+  Id putByRoomIdSync(BookingTransaction object, {bool saveLinks = true}) {
+    return putByIndexSync(r'roomId', object, saveLinks: saveLinks);
+  }
+
+  Future<List<Id>> putAllByRoomId(List<BookingTransaction> objects) {
+    return putAllByIndex(r'roomId', objects);
+  }
+
+  List<Id> putAllByRoomIdSync(List<BookingTransaction> objects,
+      {bool saveLinks = true}) {
+    return putAllByIndexSync(r'roomId', objects, saveLinks: saveLinks);
+  }
+}
+
 extension BookingTransactionQueryWhereSort
     on QueryBuilder<BookingTransaction, BookingTransaction, QWhere> {
   QueryBuilder<BookingTransaction, BookingTransaction, QAfterWhere> anyId() {
     return QueryBuilder.apply(this, (query) {
       return query.addWhereClause(const IdWhereClause.any());
+    });
+  }
+
+  QueryBuilder<BookingTransaction, BookingTransaction, QAfterWhere>
+      anyRoomId() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addWhereClause(
+        const IndexWhereClause.any(indexName: r'roomId'),
+      );
     });
   }
 }
@@ -189,6 +267,99 @@ extension BookingTransactionQueryWhere
         lower: lowerId,
         includeLower: includeLower,
         upper: upperId,
+        includeUpper: includeUpper,
+      ));
+    });
+  }
+
+  QueryBuilder<BookingTransaction, BookingTransaction, QAfterWhereClause>
+      roomIdEqualTo(int roomId) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addWhereClause(IndexWhereClause.equalTo(
+        indexName: r'roomId',
+        value: [roomId],
+      ));
+    });
+  }
+
+  QueryBuilder<BookingTransaction, BookingTransaction, QAfterWhereClause>
+      roomIdNotEqualTo(int roomId) {
+    return QueryBuilder.apply(this, (query) {
+      if (query.whereSort == Sort.asc) {
+        return query
+            .addWhereClause(IndexWhereClause.between(
+              indexName: r'roomId',
+              lower: [],
+              upper: [roomId],
+              includeUpper: false,
+            ))
+            .addWhereClause(IndexWhereClause.between(
+              indexName: r'roomId',
+              lower: [roomId],
+              includeLower: false,
+              upper: [],
+            ));
+      } else {
+        return query
+            .addWhereClause(IndexWhereClause.between(
+              indexName: r'roomId',
+              lower: [roomId],
+              includeLower: false,
+              upper: [],
+            ))
+            .addWhereClause(IndexWhereClause.between(
+              indexName: r'roomId',
+              lower: [],
+              upper: [roomId],
+              includeUpper: false,
+            ));
+      }
+    });
+  }
+
+  QueryBuilder<BookingTransaction, BookingTransaction, QAfterWhereClause>
+      roomIdGreaterThan(
+    int roomId, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addWhereClause(IndexWhereClause.between(
+        indexName: r'roomId',
+        lower: [roomId],
+        includeLower: include,
+        upper: [],
+      ));
+    });
+  }
+
+  QueryBuilder<BookingTransaction, BookingTransaction, QAfterWhereClause>
+      roomIdLessThan(
+    int roomId, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addWhereClause(IndexWhereClause.between(
+        indexName: r'roomId',
+        lower: [],
+        upper: [roomId],
+        includeUpper: include,
+      ));
+    });
+  }
+
+  QueryBuilder<BookingTransaction, BookingTransaction, QAfterWhereClause>
+      roomIdBetween(
+    int lowerRoomId,
+    int upperRoomId, {
+    bool includeLower = true,
+    bool includeUpper = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addWhereClause(IndexWhereClause.between(
+        indexName: r'roomId',
+        lower: [lowerRoomId],
+        includeLower: includeLower,
+        upper: [upperRoomId],
         includeUpper: includeUpper,
       ));
     });

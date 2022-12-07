@@ -17,8 +17,13 @@ const KeyCardSchema = CollectionSchema(
   name: r'KeyCard',
   id: -1640417581910657952,
   properties: {
-    r'name': PropertySchema(
+    r'bookingTransactionId': PropertySchema(
       id: 0,
+      name: r'bookingTransactionId',
+      type: IsarType.long,
+    ),
+    r'name': PropertySchema(
+      id: 1,
       name: r'name',
       type: IsarType.string,
     )
@@ -53,7 +58,8 @@ void _keyCardSerialize(
   List<int> offsets,
   Map<Type, List<int>> allOffsets,
 ) {
-  writer.writeString(offsets[0], object.name);
+  writer.writeLong(offsets[0], object.bookingTransactionId);
+  writer.writeString(offsets[1], object.name);
 }
 
 KeyCard _keyCardDeserialize(
@@ -63,8 +69,9 @@ KeyCard _keyCardDeserialize(
   Map<Type, List<int>> allOffsets,
 ) {
   final object = KeyCard(
-    reader.readString(offsets[0]),
+    reader.readString(offsets[1]),
   );
+  object.bookingTransactionId = reader.readLongOrNull(offsets[0]);
   object.id = id;
   return object;
 }
@@ -77,6 +84,8 @@ P _keyCardDeserializeProp<P>(
 ) {
   switch (propertyId) {
     case 0:
+      return (reader.readLongOrNull(offset)) as P;
+    case 1:
       return (reader.readString(offset)) as P;
     default:
       throw IsarError('Unknown property with id $propertyId');
@@ -172,6 +181,80 @@ extension KeyCardQueryWhere on QueryBuilder<KeyCard, KeyCard, QWhereClause> {
 
 extension KeyCardQueryFilter
     on QueryBuilder<KeyCard, KeyCard, QFilterCondition> {
+  QueryBuilder<KeyCard, KeyCard, QAfterFilterCondition>
+      bookingTransactionIdIsNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNull(
+        property: r'bookingTransactionId',
+      ));
+    });
+  }
+
+  QueryBuilder<KeyCard, KeyCard, QAfterFilterCondition>
+      bookingTransactionIdIsNotNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNotNull(
+        property: r'bookingTransactionId',
+      ));
+    });
+  }
+
+  QueryBuilder<KeyCard, KeyCard, QAfterFilterCondition>
+      bookingTransactionIdEqualTo(int? value) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'bookingTransactionId',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<KeyCard, KeyCard, QAfterFilterCondition>
+      bookingTransactionIdGreaterThan(
+    int? value, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        include: include,
+        property: r'bookingTransactionId',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<KeyCard, KeyCard, QAfterFilterCondition>
+      bookingTransactionIdLessThan(
+    int? value, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.lessThan(
+        include: include,
+        property: r'bookingTransactionId',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<KeyCard, KeyCard, QAfterFilterCondition>
+      bookingTransactionIdBetween(
+    int? lower,
+    int? upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.between(
+        property: r'bookingTransactionId',
+        lower: lower,
+        includeLower: includeLower,
+        upper: upper,
+        includeUpper: includeUpper,
+      ));
+    });
+  }
+
   QueryBuilder<KeyCard, KeyCard, QAfterFilterCondition> idEqualTo(Id value) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.equalTo(
@@ -362,6 +445,19 @@ extension KeyCardQueryLinks
     on QueryBuilder<KeyCard, KeyCard, QFilterCondition> {}
 
 extension KeyCardQuerySortBy on QueryBuilder<KeyCard, KeyCard, QSortBy> {
+  QueryBuilder<KeyCard, KeyCard, QAfterSortBy> sortByBookingTransactionId() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'bookingTransactionId', Sort.asc);
+    });
+  }
+
+  QueryBuilder<KeyCard, KeyCard, QAfterSortBy>
+      sortByBookingTransactionIdDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'bookingTransactionId', Sort.desc);
+    });
+  }
+
   QueryBuilder<KeyCard, KeyCard, QAfterSortBy> sortByName() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'name', Sort.asc);
@@ -377,6 +473,19 @@ extension KeyCardQuerySortBy on QueryBuilder<KeyCard, KeyCard, QSortBy> {
 
 extension KeyCardQuerySortThenBy
     on QueryBuilder<KeyCard, KeyCard, QSortThenBy> {
+  QueryBuilder<KeyCard, KeyCard, QAfterSortBy> thenByBookingTransactionId() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'bookingTransactionId', Sort.asc);
+    });
+  }
+
+  QueryBuilder<KeyCard, KeyCard, QAfterSortBy>
+      thenByBookingTransactionIdDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'bookingTransactionId', Sort.desc);
+    });
+  }
+
   QueryBuilder<KeyCard, KeyCard, QAfterSortBy> thenById() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'id', Sort.asc);
@@ -404,6 +513,12 @@ extension KeyCardQuerySortThenBy
 
 extension KeyCardQueryWhereDistinct
     on QueryBuilder<KeyCard, KeyCard, QDistinct> {
+  QueryBuilder<KeyCard, KeyCard, QDistinct> distinctByBookingTransactionId() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'bookingTransactionId');
+    });
+  }
+
   QueryBuilder<KeyCard, KeyCard, QDistinct> distinctByName(
       {bool caseSensitive = true}) {
     return QueryBuilder.apply(this, (query) {
@@ -417,6 +532,12 @@ extension KeyCardQueryProperty
   QueryBuilder<KeyCard, int, QQueryOperations> idProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'id');
+    });
+  }
+
+  QueryBuilder<KeyCard, int?, QQueryOperations> bookingTransactionIdProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'bookingTransactionId');
     });
   }
 

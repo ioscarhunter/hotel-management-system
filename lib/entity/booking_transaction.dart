@@ -9,6 +9,7 @@ class BookingTransaction {
   @Index(type: IndexType.value)
   Id id = Isar.autoIncrement;
 
+  @Index(type: IndexType.value, unique: true)
   final int roomId;
   final int guestId;
   final int keyCardId;

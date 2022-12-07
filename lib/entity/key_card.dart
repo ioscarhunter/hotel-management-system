@@ -10,4 +10,6 @@ class KeyCard {
   Id id = Isar.autoIncrement;
 
   final String name;
+
+  int? bookingTransactionId;
 }
