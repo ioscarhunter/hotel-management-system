@@ -163,6 +163,6 @@ class BookingDataRepository {
   }
 
   Future<void> clearData() {
-    return localDataService.isar.clear();
+    return localDataService.isar.writeTxn(() => localDataService.isar.clear());
   }
 }
