@@ -6,3 +6,7 @@
 build/
 
 .idea/
+
+LocalData.isar
+
+LocalData.isar-lck
