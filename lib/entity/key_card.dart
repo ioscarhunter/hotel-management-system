@@ -12,6 +12,6 @@ class KeyCard {
   @Index(type: IndexType.value, unique: true)
   final String name;
 
-  @Index(type: IndexType.value, unique: true)
+  @Index(type: IndexType.value)
   int? bookingTransactionId;
 }

@@ -16,7 +16,7 @@ class Room {
 
   String get roomName => floor + number;
 
-  @Index(type: IndexType.value, unique: true)
+  @Index(type: IndexType.value)
   int? bookingTransactionId;
 
   @override

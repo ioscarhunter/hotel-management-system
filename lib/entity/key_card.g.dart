@@ -50,7 +50,7 @@ const KeyCardSchema = CollectionSchema(
     r'bookingTransactionId': IndexSchema(
       id: 4948458780082013689,
       name: r'bookingTransactionId',
-      unique: true,
+      unique: false,
       replace: false,
       properties: [
         IndexPropertySchema(
@@ -182,65 +182,6 @@ extension KeyCardByIndex on IsarCollection<KeyCard> {
 
   List<Id> putAllByNameSync(List<KeyCard> objects, {bool saveLinks = true}) {
     return putAllByIndexSync(r'name', objects, saveLinks: saveLinks);
-  }
-
-  Future<KeyCard?> getByBookingTransactionId(int? bookingTransactionId) {
-    return getByIndex(r'bookingTransactionId', [bookingTransactionId]);
-  }
-
-  KeyCard? getByBookingTransactionIdSync(int? bookingTransactionId) {
-    return getByIndexSync(r'bookingTransactionId', [bookingTransactionId]);
-  }
-
-  Future<bool> deleteByBookingTransactionId(int? bookingTransactionId) {
-    return deleteByIndex(r'bookingTransactionId', [bookingTransactionId]);
-  }
-
-  bool deleteByBookingTransactionIdSync(int? bookingTransactionId) {
-    return deleteByIndexSync(r'bookingTransactionId', [bookingTransactionId]);
-  }
-
-  Future<List<KeyCard?>> getAllByBookingTransactionId(
-      List<int?> bookingTransactionIdValues) {
-    final values = bookingTransactionIdValues.map((e) => [e]).toList();
-    return getAllByIndex(r'bookingTransactionId', values);
-  }
-
-  List<KeyCard?> getAllByBookingTransactionIdSync(
-      List<int?> bookingTransactionIdValues) {
-    final values = bookingTransactionIdValues.map((e) => [e]).toList();
-    return getAllByIndexSync(r'bookingTransactionId', values);
-  }
-
-  Future<int> deleteAllByBookingTransactionId(
-      List<int?> bookingTransactionIdValues) {
-    final values = bookingTransactionIdValues.map((e) => [e]).toList();
-    return deleteAllByIndex(r'bookingTransactionId', values);
-  }
-
-  int deleteAllByBookingTransactionIdSync(
-      List<int?> bookingTransactionIdValues) {
-    final values = bookingTransactionIdValues.map((e) => [e]).toList();
-    return deleteAllByIndexSync(r'bookingTransactionId', values);
-  }
-
-  Future<Id> putByBookingTransactionId(KeyCard object) {
-    return putByIndex(r'bookingTransactionId', object);
-  }
-
-  Id putByBookingTransactionIdSync(KeyCard object, {bool saveLinks = true}) {
-    return putByIndexSync(r'bookingTransactionId', object,
-        saveLinks: saveLinks);
-  }
-
-  Future<List<Id>> putAllByBookingTransactionId(List<KeyCard> objects) {
-    return putAllByIndex(r'bookingTransactionId', objects);
-  }
-
-  List<Id> putAllByBookingTransactionIdSync(List<KeyCard> objects,
-      {bool saveLinks = true}) {
-    return putAllByIndexSync(r'bookingTransactionId', objects,
-        saveLinks: saveLinks);
   }
 }
 
