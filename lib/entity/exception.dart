@@ -38,3 +38,13 @@ class InformationMismatchException implements Exception {
   @override
   String toString() => 'Only ${bookedGuest.name} can checkout with keycard number $keyCardName.';
 }
+
+class FloorNotAvailableException implements Exception {
+  FloorNotAvailableException(this.floor, this.guestName);
+
+  final String floor;
+  final String guestName;
+
+  @override
+  String toString() => 'Cannot book floor $floor for $guestName.';
+}
