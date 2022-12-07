@@ -23,19 +23,23 @@ class BookingRepository {
     final BookingTransaction? query = await dataRepository.getBookingTransactionByRoomId(room.id);
 
     if (query != null) {
-      final Guest bookedGuest = await dataRepository.getGuestById(query.guestId);
+      final Guest bookedGuest = dataRepository.getGuestFromBookingTransaction(query);
       throw RoomOccupiedException(room, guestName, bookedGuest);
     }
 
     final Guest bookingGuest = await dataRepository.createGuest(guestName, age);
     final KeyCard keyCard = await dataRepository.getFirstUnoccupiedKeyCard();
 
-    return dataRepository.createBookingTransaction(BookingTransaction(room.id, bookingGuest.id, keyCard.id), keyCard);
+    return dataRepository.createBookingTransaction(
+      bookingGuest,
+      keyCard,
+      room,
+    );
   }
 
-  Future<void> checkOut(String guestName, String keyCardName) async {
+  Future<Room> checkOut(String guestName, String keyCardName) async {
     final BookingTransaction bookingTransaction = await dataRepository.getBookingTransactionByKeyCardName(keyCardName);
-    final Guest bookedGuest = await dataRepository.getGuestById(bookingTransaction.guestId);
+    final Guest bookedGuest = dataRepository.getGuestFromBookingTransaction(bookingTransaction);
 
     if (bookedGuest.name != guestName) {
       throw InformationMismatchException(bookedGuest, keyCardName);
@@ -43,6 +47,34 @@ class BookingRepository {
 
     final KeyCard keyCard = await dataRepository.getKeyCardByName(keyCardName);
     return dataRepository.deleteBookingTransaction(bookingTransaction, keyCard);
+  }
+
+  Future<List<Room>> getAvailableRoom() {
+    return dataRepository.getAvailableRoom();
+  }
+
+  Future<List<Guest>> getAllGuest() {
+    return dataRepository.getAllGuest();
+  }
+
+  Future<List<Guest>> getAllGuestAgeLessThan(int age) {
+    return dataRepository.getAllGuestAgeLessThan(age);
+  }
+
+  Future<List<Guest>> getAllGuestAgeGreaterThan(int age) {
+    return dataRepository.getAllGuestAgeGreaterThan(age);
+  }
+
+  Future<List<Guest>> getAllGuestAgeEqualTo(int age) {
+    return dataRepository.getAllGuestAgeEqualTo(age);
+  }
+
+  Future<List<Guest>> getAllGuestByFloor(String floor) {
+    return dataRepository.getAllGuestByFloor(floor);
+  }
+
+  Future<Guest> getGuestByRoom(String roomNumber) {
+    return dataRepository.getGuestByRoom(roomNumber);
   }
 
   Future<void> clearData() {

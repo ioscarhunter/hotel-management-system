@@ -17,4 +17,7 @@ class Guest {
 
   @Backlink(to: 'guest')
   final IsarLinks<BookingTransaction> bookingTransaction = IsarLinks();
+
+  @override
+  String toString() => name;
 }

@@ -37,30 +37,49 @@ class BookingDataRepository {
     });
   }
 
-  Future<KeyCard> createBookingTransaction(BookingTransaction bookingTransaction, KeyCard keyCard) {
+  Future<KeyCard> createBookingTransaction(
+    Guest guest,
+    KeyCard keyCard,
+    Room room,
+  ) {
     return localDataService.isar.writeTxn(() async {
-      int bookingId = await bookingTransactions.put(bookingTransaction);
-      await keyCards.put(keyCard..bookingTransactionId = bookingId);
-      return keyCard;
+      final BookingTransaction bookingTransaction = BookingTransaction();
+      final int bookingId = await bookingTransactions.put(bookingTransaction);
+
+      bookingTransaction.guest.value = guest;
+      await bookingTransaction.guest.save();
+      bookingTransaction.keyCard.value = keyCard;
+      await bookingTransaction.keyCard.save();
+      bookingTransaction.room.value = room;
+      await bookingTransaction.room.save();
+
+      // await Future.wait([
+      //   keyCards.put(keyCard..bookingTransactionId = bookingId),
+      //   rooms.put(room..bookingTransactionId = bookingId),
+      // ]);
+      return bookingTransaction.keyCard.value!;
     });
   }
 
-  Future<void> deleteBookingTransaction(BookingTransaction bookingTransaction, KeyCard keyCard) {
-    return localDataService.isar.writeTxn(() {
+  Future<Room> deleteBookingTransaction(BookingTransaction bookingTransaction, KeyCard keyCard) async {
+    final Room room = bookingTransaction.room.value!;
+    await localDataService.isar.writeTxn(() {
       return Future.wait([
         bookingTransactions.delete(bookingTransaction.id),
-        keyCards.put(keyCard..bookingTransactionId = null),
+        // keyCards.put(keyCard..bookingTransactionId = null),
+        // rooms.put(room.bookingTransaction.value = null),
       ]);
     });
+    return room;
   }
 
   Future<BookingTransaction?> getBookingTransactionByRoomId(int roomId) {
-    return bookingTransactions.getByRoomId(roomId);
+    return bookingTransactions.filter().room((q) => q.idEqualTo(roomId)).findFirst();
   }
 
   Future<BookingTransaction> getBookingTransactionByKeyCardName(String keyCardName) async {
-    KeyCard keyCard = await getKeyCardByName(keyCardName);
-    return bookingTransactions.getByKeyCardId(keyCard.id).then((value) => value!);
+    // KeyCard keyCard = await getKeyCardByName(keyCardName);
+    return bookingTransactions.filter().keyCard((q) => q.nameEqualTo(keyCardName)).findFirst().then((value) => value!);
   }
 
   Future<Guest?> getGuestByName(String guestName) {
@@ -69,6 +88,10 @@ class BookingDataRepository {
 
   Future<Guest> getGuestById(int id) {
     return guests.get(id).then((value) => value!);
+  }
+
+  Guest getGuestFromBookingTransaction(BookingTransaction bookingTransaction) {
+    return bookingTransaction.guest.value!;
   }
 
   Future<Room> getRoomByNumber(String roomNumber) {
@@ -99,10 +122,44 @@ class BookingDataRepository {
   }
 
   Future<KeyCard> getFirstUnoccupiedKeyCard() {
-    return keyCards.filter().bookingTransactionIdIsNull().findFirst().then((value) {
+    return keyCards.filter().bookingTransactionIsNull().findFirst().then((value) {
       if (value == null) throw RoomFullException();
       return value;
     });
+  }
+
+  Future<List<Room>> getAvailableRoom() {
+    return rooms.filter().bookingTransactionIsNull().findAll();
+  }
+
+  Future<List<Guest>> getAllGuest() {
+    return guests.filter().bookingTransactionIsNotEmpty().findAll();
+  }
+
+  Future<List<Guest>> getAllGuestAgeLessThan(int age) {
+    return guests.filter().bookingTransactionIsNotEmpty().ageLessThan(age).findAll();
+  }
+
+  Future<List<Guest>> getAllGuestAgeGreaterThan(int age) {
+    return guests.filter().bookingTransactionIsNotEmpty().ageGreaterThan(age).findAll();
+  }
+
+  Future<List<Guest>> getAllGuestAgeEqualTo(int age) {
+    return guests.filter().bookingTransactionIsNotEmpty().ageEqualTo(age).findAll();
+  }
+
+  Future<List<Guest>> getAllGuestByFloor(String floor) {
+    return bookingTransactions
+        .filter()
+        .room((q) => q.floorEqualTo(floor))
+        .findAll()
+        .then((bookings) => bookings.map((booking) => booking.guest.value!).toList());
+  }
+
+  Future<Guest> getGuestByRoom(String roomNumber) {
+    return getRoomByNumber(roomNumber)
+        .then((room) => bookingTransactions.filter().room((q) => q.idEqualTo(room.id)).findFirst())
+        .then((booking) => booking!.guest.value!);
   }
 
   Future<void> clearData() {
