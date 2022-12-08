@@ -14,7 +14,7 @@ import 'booking_repository_test.mocks.dart';
 
 @GenerateMocks([BookingDataRepository])
 void main() {
-  late BookingDataRepository dataRepository;
+  late MockBookingDataRepository dataRepository;
   late BookingRepository sut;
 
   setUp(() {
@@ -65,7 +65,6 @@ void main() {
     final Guest guest1 = Guest('name1', 1);
     final Guest guest2 = Guest('name2', 2);
     final KeyCard keyCard1 = KeyCard('1');
-    final KeyCard keyCard2 = KeyCard('2');
 
     test('should return room when keyCard and name match', () async {
       when(dataRepository.getBookingTransactionByKeyCardName(keyCard1.name))
