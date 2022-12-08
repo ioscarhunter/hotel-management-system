@@ -106,6 +106,10 @@ class BookingDataRepository {
     return bookingTransactions.filter().room((q) => q.idEqualTo(roomId)).findFirst();
   }
 
+  Future<BookingTransaction?> getBookingTransactionByRoomName(String roomName) {
+    return bookingTransactions.filter().room((q) => q.roomNameEqualTo(roomName)).findFirst();
+  }
+
   Future<BookingTransaction> getBookingTransactionByKeyCardName(String keyCardName) async {
     return bookingTransactions.filter().keyCard((q) => q.nameEqualTo(keyCardName)).findFirst().then((value) => value!);
   }
@@ -122,8 +126,8 @@ class BookingDataRepository {
     return bookingTransaction.guest.value!;
   }
 
-  Future<Room> getRoomByNumber(String roomNumber) {
-    final Tuple2<String, String> roomFloorAndNumber = RoomExtension.splitRoomName(roomNumber);
+  Future<Room> getRoomByName(String roomName) {
+    final Tuple2<String, String> roomFloorAndNumber = RoomExtension.splitRoomName(roomName);
 
     return rooms
         .filter()
@@ -132,7 +136,7 @@ class BookingDataRepository {
         .numberEqualTo(roomFloorAndNumber.item2)
         .findFirst()
         .then((value) {
-      if (value == null) throw RoomNotFoundException(roomNumber);
+      if (value == null) throw RoomNotFoundException(roomName);
       return value;
     });
   }
@@ -200,8 +204,8 @@ class BookingDataRepository {
         .then((bookings) => bookings.map((booking) => booking.guest.value!).toList());
   }
 
-  Future<Guest> getGuestByRoom(String roomNumber) {
-    return getRoomByNumber(roomNumber)
+  Future<Guest> getGuestByRoom(String roomName) {
+    return getRoomByName(roomName)
         .then((room) => bookingTransactions.filter().room((q) => q.idEqualTo(room.id)).findFirst())
         .then((booking) => booking!.guest.value!);
   }

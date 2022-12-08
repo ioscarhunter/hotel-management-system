@@ -21,12 +21,12 @@ class RoomFullException implements Exception {
 }
 
 class RoomNotFoundException implements Exception {
-  RoomNotFoundException(this.roomNumber);
+  RoomNotFoundException(this.roomName);
 
-  final String roomNumber;
+  final String roomName;
 
   @override
-  String toString() => 'Room $roomNumber not found.';
+  String toString() => 'Room $roomName not found.';
 }
 
 class InformationMismatchException implements Exception {

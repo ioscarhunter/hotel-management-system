@@ -19,8 +19,8 @@ class BookingRepository {
     return dataRepository.createKeyCard(keyCards);
   }
 
-  Future<KeyCard> checkIn(String guestName, int age, String roomNumber) async {
-    final Room room = await dataRepository.getRoomByNumber(roomNumber);
+  Future<KeyCard> checkIn(String guestName, int age, String roomName) async {
+    final Room room = await dataRepository.getRoomByName(roomName);
     final BookingTransaction? query = await dataRepository.getBookingTransactionByRoomId(room.id);
 
     if (query != null) {
@@ -74,8 +74,8 @@ class BookingRepository {
     return dataRepository.getAllGuestByFloor(floor);
   }
 
-  Future<Guest> getGuestByRoom(String roomNumber) {
-    return dataRepository.getGuestByRoom(roomNumber);
+  Future<Guest> getGuestByRoom(String roomName) {
+    return dataRepository.getGuestByRoom(roomName);
   }
 
   Future<List<Room>> checkOutByFloor(String floor) {
@@ -87,8 +87,6 @@ class BookingRepository {
       throw FloorNotAvailableException(floor, guestName);
     }
     final List<Room> roomsByFloor = await dataRepository.getRoomByFloor(floor);
-
-    await dataRepository.getNumberOfUnoccupiedKeyCard(roomsByFloor.length);
 
     final Guest bookingGuest = await dataRepository.createGuest(guestName, age);
 

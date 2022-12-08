@@ -27,10 +27,10 @@ class HotelSystem {
         .then((values) => 'Hotel created with $floorCount floor(s), $roomPerFloorCount room(s) per floor.');
   }
 
-  Future<String> checkIn(String guestName, int age, String roomNumber) {
+  Future<String> checkIn(String guestName, int age, String roomName) {
     return repository
-        .checkIn(guestName, age, roomNumber)
-        .then((keyCard) => 'Room $roomNumber is booked by $guestName with keycard number ${keyCard.name}.');
+        .checkIn(guestName, age, roomName)
+        .then((keyCard) => 'Room $roomName is booked by $guestName with keycard number ${keyCard.name}.');
   }
 
   Future<String> checkout(String guestName, String keyCardName) {
@@ -65,8 +65,8 @@ class HotelSystem {
     return repository.getAllGuestByFloor(floor).then((guests) => guests.format);
   }
 
-  Future<String> getGuestByRoom(String roomNumber) {
-    return repository.getGuestByRoom(roomNumber).then((guest) => guest.name);
+  Future<String> getGuestByRoom(String roomName) {
+    return repository.getGuestByRoom(roomName).then((guest) => guest.name);
   }
 
   Future<String> checkOutByFloor(String floor) {
