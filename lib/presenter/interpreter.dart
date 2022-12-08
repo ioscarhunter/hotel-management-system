@@ -13,13 +13,13 @@ class Interpreter {
 
   void executeCommands(List<List<String>> commands) {
     try {
-      Future.forEach(commands, (command) async => await executeCommand(command));
+      Future.forEach(commands, (command) async => await _executeCommand(command));
     } catch (exception) {
       print(exception.toString());
     }
   }
 
-  Future<void> executeCommand(List<String> command) async {
+  Future<void> _executeCommand(List<String> command) async {
     try {
       print(await convertCommand(command));
     } catch (exception) {

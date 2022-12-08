@@ -17,11 +17,7 @@ class HotelSystem {
       }
     }
 
-    List<KeyCard> keyCards = [];
-
-    for (int cardName = 1; cardName <= floorCount * roomPerFloorCount; cardName++) {
-      keyCards.add(KeyCard('$cardName'));
-    }
+    final List<KeyCard> keyCards = List.generate(floorCount * roomPerFloorCount, (index) => KeyCard('${index + 1}'));
 
     return Future.wait([repository.createRoom(rooms), repository.createKeyCard(keyCards)])
         .then((values) => 'Hotel created with $floorCount floor(s), $roomPerFloorCount room(s) per floor.');
