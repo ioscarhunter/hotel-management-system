@@ -1,2 +1,6 @@
-A sample command-line application with an entrypoint in `bin/`, library code
+A simple Hotel management application with an entrypoint in `bin/`, library code
 in `lib/`, and example unit test in `test/`.
+
+Use command  `dart .\bin\hotel_management_system.dart` to execute Application
+
+Use `dart run test` to run unit test
